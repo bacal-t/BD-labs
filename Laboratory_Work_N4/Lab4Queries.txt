@@ -1,0 +1,186 @@
+use universitatea
+--1--
+select * from grupe ;
+
+--2--
+
+select d.Disciplina from discipline d
+order by d.Nr_ore_plan_disciplina desc ;
+
+--3--
+
+select distinct Disciplina, Nume_Profesor,Prenume_Profesor
+from (profesori p inner join (select sr.Id_Disciplina , sr.Id_Profesor from studenti_reusita sr) st
+on p.Id_Profesor = st.Id_Profesor  
+inner join discipline d 
+on d.Id_Disciplina =st.Id_Disciplina) 
+order by Nume_Profesor desc ,Prenume_Profesor desc;
+
+--4--
+select d.Disciplina as LengthOfDisciplina
+ from discipline d
+ where  LEN(d.Disciplina) > 20;
+
+
+ --5--
+
+ SELECT s.Nume_Student, s.Prenume_Student from studenti s 
+ where s.Nume_Student LIKE '%u'  ;
+
+
+ --6--
+
+select  top(5) Nume_Student , Prenume_Student 
+
+ from  studenti_reusita sr inner join discipline d on sr.Id_Disciplina=d.Id_Disciplina
+			inner join studenti s on s.Id_Student=sr.Id_Student 
+
+where sr.Tip_Evaluare ='Testul 2' and sr.Nota is not null and d.Disciplina = 'Baze de date '  
+order by Nota desc
+;
+
+--7--
+
+select Cod_Grupa from grupe g inner join studenti_reusita sr on g.Id_Grupa=sr.Id_Grupa
+inner join studenti s on sr.Id_Student=s.Id_Student
+where Adresa_Postala_Student= '%31 August%' ;
+
+--8--
+
+select distinct s.Id_Student, s.Nume_Student  from studenti s inner join studenti_reusita sr on
+s.Id_Student=sr.Id_Student 
+where sr.Data_Evaluare like '%2018%' and sr.Tip_Evaluare='Examen';
+
+
+--9--
+
+
+select distinct s.Nume_Student,s.Adresa_Postala_Student,d.Id_Disciplina from studenti s inner join studenti_reusita sr on 
+s.Id_Student=sr.Id_Student
+inner join discipline d on 
+d.Id_Disciplina=sr.Id_Disciplina
+
+where sr.Nota > 8 and sr.Data_Evaluare like '2018%'
+
+
+--10-- 
+
+
+select s.Nume_Student, s.Prenume_Student  ,sr.Nota from studenti s inner join studenti_reusita sr on 
+s.Id_Student =sr.Id_Student
+inner join discipline d on sr.Id_Disciplina=d.Id_Disciplina
+
+where d.Disciplina='Baze de date ' and sr.Tip_Evaluare='Examen' and sr.Data_Evaluare like '2018%' and sr.Nota between 4 and 8 ;
+
+
+
+--11--
+
+
+select distinct p.Nume_Profesor,p.Prenume_Profesor from profesori p inner join studenti_reusita sr on p.Id_Profesor=sr.Id_Profesor
+inner join discipline d on d.Id_Disciplina=sr.Id_Disciplina
+where d.Disciplina='Baze de date ' and sr.Data_Evaluare like '2018%' and sr.Nota < 5;
+
+--12--
+
+
+select  s.Nume_Student,s.Prenume_Student,d.Disciplina,sr.Nota,sr.Data_Evaluare from studenti_reusita sr inner join studenti s on sr.Id_Student=s.Id_Student 
+inner join discipline d on sr.Id_Disciplina=d.Id_Disciplina
+where s.Prenume_Student='Alex' ;
+
+
+--13--
+
+select distinct d.Disciplina from studenti_reusita sr inner join studenti s on sr.Id_Student=s.Id_Student
+inner join discipline d on sr.Id_Disciplina=d.Id_Disciplina 
+where s.Nume_Student='Florea' and s.Prenume_Student='Ioan';
+
+--14--
+
+
+select distinct s.Nume_Student,s.Prenume_Student,d.Disciplina from studenti_reusita sr inner join studenti s on sr.Id_Student=s.Id_Student
+inner join discipline d on sr.Id_Disciplina=d.Id_Disciplina
+
+where sr.Nota > 8 and sr.Tip_Evaluare='Examen' ;
+
+
+--15--
+
+select s.Nume_Student,s.Prenume_Student from studenti_reusita sr inner join studenti s on sr.Id_Student=s.Id_Student
+inner join profesori p on sr.Id_Profesor=p.Id_Profesor
+where sr.Tip_Evaluare='Examen'  and
+  sr.Data_Evaluare like '2017' and (p.Prenume_Profesor like 'Ion'or p.Prenume_Profesor like 'George' ) ;
+
+
+--16--
+select DISTINCT d.Nr_ore_plan_disciplina, s.Nume_Student,s.Prenume_Student,p.Id_Profesor 
+  from studenti_reusita sr inner join discipline d on sr.Id_Disciplina=d.Id_Disciplina 
+  inner join studenti s on sr.Id_Student=s.Id_Student inner join profesori p on sr.Id_Profesor=p.Id_Profesor
+  where Nr_ore_plan_disciplina < 60
+ 
+ --17--
+ select distinct p.Nume_Profesor, p.Prenume_Profesor
+ from profesori p
+ inner join
+ (select Id_Profesor
+ from studenti_reusita
+ where Id_Student = 100) table1 on table1.Id_Profesor = p.Id_Profesor;
+
+ --18--
+select distinct p.Nume_Profesor, p.Prenume_Profesor
+ from profesori p 
+ inner join studenti_reusita sr on p.Id_Profesor=sr.Id_Profesor
+ inner join discipline d on sr.Id_Disciplina=d.Id_Disciplina
+ where Nr_ore_plan_disciplina < 60;
+
+ --19--
+ select distinct p.Nume_Profesor, p.Prenume_Profesor, Nota
+ from profesori p
+ inner join studenti_reusita sr on p.Id_Profesor=sr.Id_Profesor
+ inner join discipline d on sr.Id_Disciplina=d.Id_Disciplina
+ inner join studenti s on s.Id_Student=sr.Id_Student
+ where Nota<5 and Nume_Student = 'Cosovanu';
+
+ --20--
+ select count(Id_Student) as Passed
+ from (studenti_reusita sr inner join discipline d on sr.Id_Disciplina=d.Id_Disciplina)
+ where Tip_Evaluare = 'Testul 2' and year(Data_Evaluare) = 2018 and Disciplina='Baze de date';
+
+ --21--
+select Nume_Student, Prenume_Student, table1.NrOfGrades
+from studenti s inner join (
+select Id_Student, count(Nota) as NrOfGrades
+from studenti_reusita
+group by Id_Student 
+) table1 on s.Id_Student=table1.Id_Student;
+
+--22--
+select Nume_Profesor, Prenume_Profesor,table1.NrOfDisciplines
+from profesori p inner join(
+select  Id_Profesor, count(Distinct Id_Disciplina) as NrOfDisciplines
+from studenti_reusita
+group by Id_Profesor) table1 on p.Id_Profesor=table1.Id_Profesor;
+
+--23--
+select Distinct d.Disciplina from discipline d inner join
+(select sr.Id_Student, sr.Id_Disciplina from studenti_reusita sr inner join
+(select table1.Id_Student from 
+(select Id_Student, AVG(Nota) as NotaMedie
+from studenti_reusita
+group by Id_Student) table1 
+where table1.NotaMedie>7) table2 on sr.Id_Student=table2.Id_Student) table3 on table3.Id_Disciplina=d.Id_Disciplina;
+
+--24--
+select d.Disciplina from discipline d inner join
+(select Id_disciplina from 
+(select Id_Disciplina, count(distinct Id_Profesor) as NrOfProfesors
+from studenti_reusita
+group by Id_Disciplina) table1
+where NrOfProfesors>1 ) table2 on table2.Id_Disciplina=d.Id_Disciplina;
+
+
+
+
+
+
+
